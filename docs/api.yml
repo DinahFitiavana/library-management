@@ -177,6 +177,47 @@ components:
           type: string
         authorId:
           type: string
+  responses:
+    Responses200Base:
+      description: successful response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: success
+    AuthorResponse200:
+      description: author list
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/responses/Responses200Base'
+              - properties:
+                  body:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Author"
+    BookResponse200:
+      description: book list
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/responses/Responses200Base"
+              - properties:
+                  body:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Book"
   parameters:
     queryPagination:
       name: page
