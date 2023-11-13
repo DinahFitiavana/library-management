@@ -48,6 +48,36 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Book'
+  /books/borrowed:
+    get:
+      tags:
+        - Books
+      summary: List of books on loan
+      responses:
+        200:
+          description: List of books on loan
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Book'
+  /books/available:
+    get:
+      tags:
+        - Books
+      summary: List of available books
+      security:
+        - OAuth2: [ 'ADMINISTRATOR' ]
+      responses:
+        200:
+          description: List of available books
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Book'
   /authors:
     get:
       summary: Get all authors
@@ -108,6 +138,133 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Author'
+  /visitors:
+    get:
+      tags:
+        - Visitors
+      summary: Get all visitors
+      operationId: getAllVisitors
+      responses:
+        '200':
+          description: List of all visitors
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Visitor'
+
+  /visitors/{visitorId}:
+    get:
+      tags:
+        - "Visitors"
+      summary: Get a visitor by ID
+      operationId: getVisitorById
+      parameters:
+        - in: path
+          name: visitorId
+          description: ID of the visitor
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Visitor details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Visitor'
+  /visitors/{visitorId}/actions:
+    get:
+      tags:
+        - Visitors
+      summary: Visitor activities
+      parameters:
+        - in: path
+          name: visitorId
+          description: ID of the visitor
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: fromDate
+          description: Date of début
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: toDate
+          description: Date of end
+          schema:
+            type: string
+            format: date-time
+      responses:
+        200:
+          description: Visitor activities
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VisitorAction'
+  /visitors/{visitorId}/borrow/{bookId}:
+    post:
+      tags:
+        - Visitors
+      summary: Visitor borrows a book
+      operationId: borrowBook
+      parameters:
+        - in: path
+          name: visitorId
+          description: ID of the visitor borrowing the book
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: bookId
+          description: ID of the book to be borrowed
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BorrowRequest'
+      responses:
+        '200':
+          description: Book borrowed successfully
+
+  /visitors/{visitorId}/return/{bookId}:
+    post:
+      tags:
+        - Visitors
+      summary: Visitor returns a book
+      operationId: returnBook
+      parameters:
+        - in: path
+          name: visitorId
+          description: ID of the visitor returning the book
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: bookId
+          description: ID of the book to be returned
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReturnRequest'
+      responses:
+        '200':
+          description: Book returned successfully
+
 components:
   schemas:
     Book:
@@ -139,6 +296,50 @@ components:
           type: string
         sex:
           $ref: '#/components/schemas/Sex'
+    Visitor:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        reference:
+          type: string
+    VisitorAction:
+      type: object
+      properties:
+        visitorId:
+          type: integer
+        bookId:
+          type: string
+        action:
+          type: string
+          enum:
+            - loan
+            - return
+        timestamp:
+          type: string
+          format: date-time
+    BorrowRequest:
+      type: object
+      properties:
+        idVisitor:
+          type: integer
+        idBook:
+          type: string
+        borrowing date:
+          type: string
+          format: date
+    ReturnRequest:
+      type: object
+      properties:
+        idEmprunt:
+          type: integer
+        idVisitor:
+          type: integer
+        return date:
+          type: string
+          format: date
     Sex:
       type: string
       enum:
